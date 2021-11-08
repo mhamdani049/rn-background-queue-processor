@@ -67,7 +67,7 @@ export default class QueueProcessor {
      * Handle on failure event for job execution
      */
     onJobFail(retryCount, response) {
-        if (this.currentJob?.job ?? false) {
+        if (this.currentJob.job) {
             const {maxRetries} = this.currentJob.job;
             const {retryInterval} = this.currentJob.job;
             if (retryCount < maxRetries) {
