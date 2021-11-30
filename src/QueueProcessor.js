@@ -63,29 +63,24 @@ export default class QueueProcessor {
         this.processJob();
     }
 
-    /**
-     * Handle on failure event for job execution
-     */
     onJobFail(retryCount, response) {
-        if (this.currentJob) {
-            const {maxRetries} = this.currentJob.job;
-            const {retryInterval} = this.currentJob.job;
-            if (retryCount < maxRetries) {
-                retryCount += 1;
-                setTimeout(() => this.processJob(retryCount), retryInterval);
+        const {maxRetries} = this.currentJob.job;
+        const {retryInterval} = this.currentJob.job;
+        if (retryCount < maxRetries) {
+            retryCount += 1;
+            setTimeout(() => this.processJob(retryCount), retryInterval);
+            return;
+        }
+        if (retryCount >= maxRetries){
+            this.currentJob.jobFail(response);
+            this.failedQueue.failedJobEnqueue(this.currentJob);
+            this.queue.dequeue();
+            if (this.queue.isEmpty()) {
+                this.currentJob = null;
                 return;
             }
-            if (retryCount >= maxRetries){
-                this.currentJob.jobFail(response);
-                this.failedQueue.failedJobEnqueue(this.currentJob);
-                this.queue.dequeue();
-                if (this.queue.isEmpty()) {
-                    this.currentJob = null;
-                    return;
-                }
-                this.currentJob = this.queue.peek();
-                this.processJob();
-            }   
+            this.currentJob = this.queue.peek();
+            this.processJob();
         }
     }
 }
