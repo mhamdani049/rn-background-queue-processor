@@ -59,7 +59,8 @@ export default class Worker {
      * Sync packages up listener
      */
     syncPackagesUpListener() {
-        this.allQueues.forEach((currentQueue) => this.queueProcessor.start(currentQueue));
+        // this.allQueues.forEach((currentQueue) => this.queueProcessor.start(currentQueue));
+        if (typeof this.allQueues !== 'undefined') this.allQueues.forEach((currentQueue) => this.queueProcessor.start(currentQueue));
     }
 
     /**
